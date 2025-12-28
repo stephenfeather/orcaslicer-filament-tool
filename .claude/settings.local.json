@@ -6,7 +6,8 @@
       "Bash(black:*)",
       "Bash(isort:*)",
       "Bash(pylint:*)",
-      "Bash(python -m pytest:*)"
+      "Bash(python -m pytest:*)",
+      "Bash(mypy:*)"
     ]
   }
 }

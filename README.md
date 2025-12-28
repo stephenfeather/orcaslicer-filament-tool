@@ -41,8 +41,16 @@ For more information about OrcaSlicer profiles and how to create them, see the o
 - Resolve inheritance chains from templates
 - Export flattened, self-contained configuration packages
 - Support for filament, machine, and process profiles
-- Integrated validation using both Orca_tools validator and extra profile checks
+- **Integrated validation** with comprehensive profile checks
+  - Compatible printers verification
+  - Filament reference validation
+  - Name consistency checking
+  - Filament ID constraints
+  - Conflict detection for incompatible keys
+  - Obsolete key warnings
+- Cross-platform support (macOS first, Windows/Linux ready)
 - Support for user-created profiles from macOS Application Support directory
+- Optional Orca_tools binary validator for additional OrcaSlicer-specific checks
 
 ## Usage
 
