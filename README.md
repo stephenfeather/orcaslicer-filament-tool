@@ -29,6 +29,12 @@ Contains manufacturer-specific configurations organized by vendor. These files o
 ### profile_templates/
 Contains base-level template files that provide default settings inherited by other profiles.
 
+## References
+
+For more information about OrcaSlicer profiles and how to create them, see the official documentation:
+- [How to create profiles](https://github.com/OrcaSlicer/OrcaSlicer/wiki/How-to-create-profiles) - Official OrcaSlicer wiki guide
+- [Validate profiles](https://github.com/OrcaSlicer/OrcaSlicer/wiki/How-to-create-profiles#validate-profiles) - Profile validation guidelines
+
 ## Features
 
 - Parse OrcaSlicer configuration files (JSON format)
