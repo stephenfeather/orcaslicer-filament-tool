@@ -79,8 +79,8 @@ class ProfileResolver:
         # Load the profile
         profile = self._load_profile(profile_path)
 
-        # Detect profile type from the profile JSON
-        profile_type = self._get_profile_type(profile)
+        # Detect profile type from the profile JSON, or infer from directory
+        profile_type = self._get_profile_type(profile, profile_path)
 
         # Resolve inheritance chain
         resolved = self._resolve_inheritance_chain(profile, profile_type)
@@ -103,19 +103,26 @@ class ProfileResolver:
         """
         return load_profile(profile_path)
 
-    def _get_profile_type(self, profile: dict[str, Any]) -> ProfileType:
+    def _get_profile_type(
+        self, profile: dict[str, Any], profile_path: Path | None = None
+    ) -> ProfileType:
         """
-        Detect profile type from profile JSON.
+        Detect profile type from profile JSON or directory structure.
+
+        If the profile JSON has a "type" field, use that. Otherwise,
+        infer from the directory structure (filament, machine, process).
 
         Args:
             profile: Profile dictionary from JSON
+            profile_path: Optional path to profile file for directory inference
 
         Returns:
             ProfileType enum value
 
         Raises:
-            InvalidProfileError: If type is unknown
+            InvalidProfileError: If type cannot be determined
         """
+        # First, try to get type from profile JSON
         type_str = profile.get("type", "").lower()
 
         if type_str == "filament":
@@ -124,7 +131,26 @@ class ProfileResolver:
             return ProfileType.MACHINE
         if type_str == "process":
             return ProfileType.PROCESS
-        raise InvalidProfileError(f"Unknown profile type: {type_str}")
+
+        # If no type in JSON, try to infer from directory structure
+        if profile_path and profile_path.parent.name in (
+            "filament",
+            "machine",
+            "process",
+        ):
+            dir_type = profile_path.parent.name.lower()
+            if dir_type == "filament":
+                return ProfileType.FILAMENT
+            if dir_type == "machine":
+                return ProfileType.MACHINE
+            if dir_type == "process":
+                return ProfileType.PROCESS
+
+        raise InvalidProfileError(
+            f"Unknown profile type: {type_str}. "
+            "Set 'type' field in profile or place in "
+            "filament/machine/process directory."
+        )
 
     def _find_parent_profile(
         self, parent_name: str, profile_type: ProfileType
