@@ -1,0 +1,38 @@
+[MASTER]
+# Python version
+py-version=3.12
+
+[MESSAGES CONTROL]
+# Disable specific warnings that may be too strict for this project
+disable=
+    R0903,  # too-few-public-methods
+    R0913,  # too-many-arguments
+
+# Require docstrings for public functions/classes (Google style)
+enable=
+    C0114,  # missing-module-docstring
+    C0115,  # missing-class-docstring
+    C0116   # missing-function-docstring
+
+[FORMAT]
+# Match Black's line length
+max-line-length=88
+
+[BASIC]
+# Good variable names
+good-names=i,j,k,ex,_,f,fp
+
+[DESIGN]
+# Maximum number of arguments for function / method
+max-args=7
+
+# Maximum number of attributes for a class
+max-attributes=10
+
+[TYPECHECK]
+# Ignore missing imports for compiled modules
+ignored-modules=
+
+[IMPORTS]
+# Follow isort configuration
+known-third-party=

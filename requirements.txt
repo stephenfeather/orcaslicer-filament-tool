@@ -1,2 +1,2 @@
 # Core dependencies
-# (Will be populated as needed)
+click>=8.1.0

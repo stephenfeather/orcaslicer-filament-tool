@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ls:*)",
+      "Bash(tree:*)",
+      "Bash(black:*)",
+      "Bash(isort:*)",
+      "Bash(pylint:*)",
+      "Bash(python -m pytest:*)"
+    ]
+  }
+}
