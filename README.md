@@ -62,4 +62,16 @@ For more information about OrcaSlicer profiles and how to create them, see the o
 
 ## License
 
-(Coming soon)
+This project incorporates validation logic derived from the [OrcaSlicer](https://github.com/OrcaSlicer/OrcaSlicer) project, which is released under the **GNU AFFERO GENERAL PUBLIC LICENSE v3.0 (AGPL-3.0)**.
+
+**Specifically**:
+- Validation logic in `src/validator.py` and `orca_extra_profile_check.py` is adapted from OrcaSlicer's profile validation utilities
+- Sample profile files in `samples/` are sourced from [OrcaSlicer's official repository](https://github.com/OrcaSlicer/OrcaSlicer/tree/main/resources)
+
+By using this project, you agree to comply with the AGPL-3.0 license terms, which require that:
+- Any modifications to this code must be made available under the same AGPL-3.0 license
+- Source code must be made available to users of the software
+
+See the [OrcaSlicer License](https://github.com/OrcaSlicer/OrcaSlicer/blob/main/LICENSE) for full details.
+
+For the original OrcaSlicer project, see: https://github.com/OrcaSlicer/OrcaSlicer
