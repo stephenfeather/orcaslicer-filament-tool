@@ -41,6 +41,8 @@ For more information about OrcaSlicer profiles and how to create them, see the o
 - Resolve inheritance chains from templates
 - Export flattened, self-contained configuration packages
 - Support for filament, machine, and process profiles
+- Integrated validation using both Orca_tools validator and extra profile checks
+- Support for user-created profiles from macOS Application Support directory
 
 ## Usage
 

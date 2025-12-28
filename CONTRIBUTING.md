@@ -321,21 +321,61 @@ pylint src/
 
 ### Profile Validation
 
-Profile validation is performed using the **Orca_tools validator**, which is available as a compiled binary from the official release:
+Exported profiles must be validated using both tools to ensure correctness and compatibility:
+
+#### 1. Orca_tools Validator
+
+The **Orca_tools validator** is a compiled binary from the official release:
 - **Download**: https://github.com/SoftFever/Orca_tools/releases/tag/1
 - **Purpose**: Validates OrcaSlicer profile JSON files for correctness and compatibility
 
-#### Installation
-Download the appropriate binary for your platform from the Orca_tools releases page and place it in your system PATH or a known location.
+**Installation**: Download the appropriate binary for your platform and place it in your system PATH.
 
-#### Usage
-Before committing profile changes or sample files, validate them with the Orca_tools validator:
+**Usage**:
 ```bash
-# Validate a single profile
-orca_tools validate-profile path/to/profile.json
+# Validate a single exported profile
+orca_tools validate-profile output/profile.flattened.json
 
-# Validate all sample profiles
-orca_tools validate-profile samples/profiles/**/*.json
+# Validate all exported profiles
+orca_tools validate-profile output/*.flattened.json
+```
+
+#### 2. Orca Extra Profile Check
+
+The `orca_extra_profile_check.py` script performs additional validation:
+- Missing/empty `compatible_printers` in filament profiles
+- Obsolete or conflicting keys
+- Filament ID length constraints (max 8 chars for BBL/OrcaFilamentLibrary)
+- Missing filament references in machine default materials
+- Name consistency between vendor index and actual profile files
+
+**Usage**:
+```bash
+# Check a specific vendor's exported profiles
+python orca_extra_profile_check.py --vendor BBL --check-filaments
+
+# Check all validations for a vendor
+python orca_extra_profile_check.py --vendor Creality --check-filaments --check-materials --check-obsolete-keys
+```
+
+#### Validation Workflow
+
+When exporting profiles, run validation in this order:
+
+1. **Export the profile** - Use the export commands to generate flattened profiles
+2. **Run orca_tools validator** - Validates JSON structure and OrcaSlicer compatibility
+3. **Run orca_extra_profile_check** - Validates profile-specific requirements
+
+**Combined validation example**:
+```bash
+# Export filament profile
+orcaslicer-export export-filament "Bambu ABS @BBL X1C.json" --output ./exports
+
+# Validate with orca_tools
+orca_tools validate-profile exports/Bambu\ ABS\ @BBL\ X1C.flattened.json
+
+# Validate with orca_extra_profile_check
+python orca_extra_profile_check.py --vendor BBL --check-filaments
 ```
 
 ### Manual Pre-commit Check
