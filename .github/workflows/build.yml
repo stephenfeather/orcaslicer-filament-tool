@@ -108,6 +108,18 @@ jobs:
             src/cli.py
         shell: cmd
 
+      - name: Create Release (if needed)
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if (!(gh release view ${{ github.ref_name }} 2>$null)) {
+              Write-Host "Creating release ${{ github.ref_name }}..."
+              gh release create ${{ github.ref_name }} --title "Version ${{ github.ref_name }}" --notes "Automated build"
+          } else {
+              Write-Host "Release ${{ github.ref_name }} already exists"
+          }
+        shell: pwsh
+
       - name: Upload Windows Binary to Release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -160,6 +172,19 @@ jobs:
             --assume-yes-for-downloads \
             --remove-output \
             src/cli.py
+
+      - name: Create Release (if needed)
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Check if release exists, if not create it
+          if ! gh release view ${{ github.ref_name }} 2>/dev/null; then
+            echo "Creating release ${{ github.ref_name }}..."
+            gh release create ${{ github.ref_name }} --title "Version ${{ github.ref_name }}" --notes "Automated build"
+          else
+            echo "Release ${{ github.ref_name }} already exists"
+          fi
+        shell: bash
 
       - name: Upload Linux Binary to Release
         env:
