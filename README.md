@@ -4,7 +4,7 @@ Tools and scripts for exporting OrcaSlicer configurations as single-file package
 
 ## Overview
 
-OrcaSlicer uses an inheritance-based configuration system where filament, machine, and process profiles can inherit settings from parent templates. This tool resolves these inheritance chains and exports fully self-contained configuration files that work independently.
+OrcaSlicer uses an inheritance-based configuration system where filament, machine, and process profiles can inherit settings from parent templates. This tool resolves these inheritance chains and exports fully self-contained configuration files that work independently. Your filament settings should no longer be affected by potential underlying inherited changes.
 
 ## Features
 
@@ -25,11 +25,72 @@ OrcaSlicer uses an inheritance-based configuration system where filament, machin
 
 ## Usage
 
-(Coming soon)
+Export an OrcaSlicer profile with full inheritance resolution:
+
+```bash
+orcaslicer-export "path/to/profile.json" -o ./exports
+```
+
+### Examples
+
+**Export a filament profile**:
+```bash
+orcaslicer-export "/path/to/Fiberon PA6-GF.json" -o ./exports
+```
+
+**Export with custom filename**:
+```bash
+orcaslicer-export "/path/to/profile.json" -o ./exports --output-name my-profile.json
+```
+
+**Export with validation**:
+```bash
+orcaslicer-export "/path/to/profile.json" -o ./exports --validate
+```
+
+**Export from macOS Application Support** (example):
+```bash
+orcaslicer-export ~/Library/Application\ Support/OrcaSlicer/user/*/filament/My\ Profile.json -o ./exports
+```
+
+### Output
+
+The exporter creates a flattened JSON file with all inherited settings merged:
+- **Filename**: `{profile_name}.flattened.json`
+- **Contents**: Complete profile with all parent settings resolved and merged
+- **Independence**: The exported profile works without parent template dependencies
+
+### API Usage
+
+```python
+from pathlib import Path
+from src.config import create_config
+from src.resolver import ProfileResolver
+from src.exporter import ProfileExporter
+
+# Create config and resolver
+config = create_config()
+resolver = ProfileResolver(config)
+
+# Resolve profile inheritance
+profile_path = Path("/path/to/profile.json")
+flattened = resolver.resolve_profile(profile_path)
+
+# Export to JSON
+exporter = ProfileExporter(output_dir=Path("./exports"), validate=True)
+output_path = exporter.export_profile(flattened, filename="custom.json")
+print(f"Exported to: {output_path}")
+```
 
 ## Development
 
-(Coming soon)
+For information about setting up your development environment, running tests, code style guidelines, and contribution workflows, see [CONTRIBUTING.md](CONTRIBUTING.md).
+
+### Quick Start
+- Clone the repository
+- Install dependencies: `pip install -r requirements-dev.txt`
+- Run tests: `pytest`
+- Check code quality: `pylint src/`, `mypy src/`
 
 ## Project Structure
 
