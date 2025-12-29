@@ -130,3 +130,56 @@ jobs:
           Write-Host "Size: $($fileInfo.Length / 1MB) MB"
           gh release upload ${{ github.ref_name }} "$binary" --clobber
         shell: pwsh
+
+  build-linux:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install nuitka
+
+      - name: Build with Nuitka
+        run: |
+          python -m nuitka \
+            --standalone \
+            --output-filename=orcaslicer-export \
+            --output-dir=dist \
+            --include-package=src \
+            --assume-yes-for-downloads \
+            --remove-output \
+            src/cli.py
+
+      - name: Upload Linux Binary to Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "Looking for Linux executable..."
+          ls -lh dist/
+
+          # Nuitka creates binary in dist/cli.dist/orcaslicer-export
+          if [ -f "dist/cli.dist/orcaslicer-export" ]; then
+            BINARY="dist/cli.dist/orcaslicer-export"
+          elif [ -f "dist/orcaslicer-export" ]; then
+            BINARY="dist/orcaslicer-export"
+          else
+            echo "ERROR: Linux executable not found!"
+            find dist -type f -name "orcaslicer-export"
+            exit 1
+          fi
+
+          echo "Found executable: $BINARY"
+          ls -lh "$BINARY"
+          gh release upload ${{ github.ref_name }} "$BINARY" --clobber
+        shell: bash
