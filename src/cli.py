@@ -14,15 +14,14 @@ from src.resolver import ProfileNotFoundError
 from src.resolver import ProfileResolver
 
 
-@click.group()
+@click.group(context_settings={"help_option_names": ["-h", "--help"]})
+@click.version_option(version=__version__, prog_name="orcaslicer-export")
 def cli() -> None:
-    f"""Export OrcaSlicer profiles as self-contained JSON files.
+    """Export OrcaSlicer profiles as self-contained JSON files.
 
     This tool resolves OrcaSlicer profile inheritance chains and exports
     profiles as standalone JSON files without dependencies on parent
     templates.
-
-    Version: {__version__}
     """
 
 
