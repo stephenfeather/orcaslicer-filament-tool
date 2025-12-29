@@ -10,23 +10,8 @@ permissions:
   contents: write
 
 jobs:
-  build:
-    strategy:
-      matrix:
-        include:
-          - os: macos-latest
-            name: macos-arm64
-            artifact-name: orcaslicer-export
-
-          - os: windows-latest
-            name: windows-x64
-            artifact-name: orcaslicer-export.exe
-
-          - os: ubuntu-latest
-            name: linux-x64
-            artifact-name: orcaslicer-export
-
-    runs-on: ${{ matrix.os }}
+  build-macos:
+    runs-on: macos-latest
     timeout-minutes: 120
 
     steps:
@@ -44,8 +29,7 @@ jobs:
           pip install -r requirements.txt
           pip install nuitka
 
-      - name: Build on macOS/Linux
-        if: runner.os != 'Windows'
+      - name: Build with Nuitka
         run: |
           python -m nuitka \
             --standalone \
@@ -56,44 +40,25 @@ jobs:
             --remove-output \
             src/cli.py
 
-      - name: Build on Windows
-        if: runner.os == 'Windows'
-        shell: pwsh
-        run: |
-          python -m nuitka `
-            --standalone `
-            --output-filename=orcaslicer-export.exe `
-            --output-dir=dist `
-            --include-package=src `
-            --assume-yes-for-downloads `
-            --remove-output `
-            src/cli.py
-
-      - name: Find and Upload Binary
+      - name: Upload macOS Binary to Release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          # List what was built
-          echo "Contents of dist directory:"
-          find dist -type f | head -20
+          echo "Looking for macOS executable..."
+          ls -lh dist/
 
-          # Upload the binary
-          if [ "${{ runner.os }}" = "Windows" ]; then
-            BINARY=$(find dist -name "*.exe" -type f | head -1)
-            if [ -z "$BINARY" ]; then
-              echo "Windows executable not found in dist/"
-              exit 1
-            fi
-            echo "Uploading: $BINARY"
-            gh release upload ${{ github.ref_name }} "$BINARY" --clobber
+          # Find the executable (could be dist/orcaslicer-export or in subdirectory)
+          if [ -f "dist/orcaslicer-export" ]; then
+            BINARY="dist/orcaslicer-export"
+          elif [ -f "dist/orcaslicer-export.bin/orcaslicer-export" ]; then
+            BINARY="dist/orcaslicer-export.bin/orcaslicer-export"
           else
-            # Find executable (either dist/orcaslicer-export or in subdirectory)
-            BINARY=$(find dist -type f -executable | grep -v ".build" | head -1)
-            if [ -z "$BINARY" ]; then
-              echo "Executable not found in dist/"
-              exit 1
-            fi
-            echo "Uploading: $BINARY"
-            gh release upload ${{ github.ref_name }} "$BINARY" --clobber
+            echo "ERROR: macOS executable not found!"
+            find dist -type f -executable
+            exit 1
           fi
+
+          echo "Found executable: $BINARY"
+          ls -lh "$BINARY"
+          gh release upload ${{ github.ref_name }} "$BINARY" --clobber
         shell: bash
