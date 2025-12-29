@@ -14,7 +14,10 @@ from src.resolver import ProfileNotFoundError
 from src.resolver import ProfileResolver
 
 
-@click.group(context_settings={"help_option_names": ["-h", "--help"]})
+@click.group(
+    context_settings={"help_option_names": ["-h", "--help"]},
+    epilog="\b\nEXAMPLES:\n  orcaslicer-export \"Generic PLA.json\"\n  orcaslicer-export \"/path/to/profile.json\" --output ./exports",
+)
 @click.version_option(version=__version__, prog_name="orcaslicer-export")
 def cli() -> None:
     """Export OrcaSlicer profiles as self-contained JSON files.
