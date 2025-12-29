@@ -432,19 +432,28 @@ pre-commit run --all-files
 
 ### Release Types
 
-**Full Release** (with binaries):
-- Only created when explicitly requested
-- Format: Semantic versioning (e.g., `0.2.0`)
-- Includes compiled binaries for all supported platforms
+**Full Release**:
+- Stable, production-ready release
+- Format: Semantic versioning (e.g., `v0.5.0`)
+- Marked as latest release on GitHub
 - Tagged on main branch
 
-**Development/Test Release** (no binaries):
-- Created automatically during development and testing
-- Format: `{version}-dev.x` or `{version}-test.x` (e.g., `0.2.1-dev.1`, `0.3.0-test.2`)
-- No compiled binaries included
-- Used for CI/CD testing, intermediate releases, and development milestones
+**Pre-release** (Development/Test):
+- For testing features and CI/CD workflows
+- Format: `v{version}-dev.x` or `v{version}-test.x` (e.g., `v0.5.0-dev.1`, `v0.5.0-test.1`)
+- Automatically marked as pre-release on GitHub
+- Used for validating new features and build processes
 
-### Tagging Convention
-- Full releases: `v0.2.0`
-- Development releases: `v0.2.1-dev.1`, `v0.2.1-dev.2`, etc.
-- Test releases: `v0.3.0-test.1`, `v0.3.0-test.2`, etc.
+### Tagging Convention & CI/CD
+
+All tags matching `v*` trigger automated builds that:
+- Compile standalone executables for Linux, macOS, and Windows
+- Upload binaries to the GitHub Release with platform-specific names:
+  - `orcaslicer-export-linux`
+  - `orcaslicer-export-macos`
+  - `orcaslicer-export-windows.exe`
+
+Tag format examples:
+- Full releases: `v0.5.0`, `v1.0.0`
+- Development releases: `v0.5.0-dev.1`, `v0.5.1-dev.2`
+- Test releases: `v0.5.0-test.1`, `v0.5.0-test.2`
