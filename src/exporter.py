@@ -35,6 +35,7 @@ class ProfileExporter:
         self,
         profile: dict[str, Any],
         filename: str | None = None,
+        source_path: Path | None = None,
     ) -> Path:
         """
         Export a single profile to a JSON file.
@@ -45,12 +46,13 @@ class ProfileExporter:
         Args:
             profile: Profile dictionary to export
             filename: Optional custom filename (without path)
+            source_path: Optional path to source file (used to prevent overwriting)
 
         Returns:
             Absolute path to the exported file
 
         Raises:
-            ExportError: If export fails
+            ExportError: If export fails or would overwrite source
 
         Examples:
             >>> profile = {"name": "Test", "type": "filament"}
@@ -71,6 +73,10 @@ class ProfileExporter:
 
             # Build full output path
             output_path = self.output_dir / filename
+
+            # Check if output would overwrite source file
+            if source_path is not None:
+                self._check_source_collision(source_path, output_path)
 
             # Validate if enabled
             if self.validate:
@@ -196,6 +202,34 @@ class ProfileExporter:
         # Check for required fields
         if "name" not in profile:
             raise ExportError("Profile must have a 'name' field")
+
+    def _check_source_collision(self, source_path: Path, output_path: Path) -> None:
+        """
+        Check if output path would overwrite the source file.
+
+        Compares resolved absolute paths to catch edge cases like symlinks,
+        relative paths, or different path representations of the same file.
+
+        Args:
+            source_path: Path to source profile file
+            output_path: Path to intended output file
+
+        Raises:
+            ExportError: If output would overwrite source
+        """
+        # Resolve to absolute paths to handle symlinks and relative paths
+        source_abs = source_path.resolve()
+        output_abs = output_path.resolve()
+
+        # Check if they point to the same file
+        if source_abs == output_abs:
+            raise ExportError(
+                f"Cannot overwrite source profile file!\n"
+                f"  Source: {source_abs}\n"
+                f"  Output would be: {output_abs}\n\n"
+                f"Use --output with a different directory or "
+                f"--output-name with a different filename."
+            )
 
 
 __all__ = [

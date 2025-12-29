@@ -112,6 +112,7 @@ def export(
         output_path = exporter.export_profile(
             resolved_profile,
             filename=output_name,
+            source_path=profile_path,
         )
 
         click.echo()
