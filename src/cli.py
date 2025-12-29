@@ -4,6 +4,7 @@ from pathlib import Path
 
 import click
 
+from src import __version__
 from src.config import create_config
 from src.exporter import ExportError
 from src.exporter import ProfileExporter
@@ -15,11 +16,13 @@ from src.resolver import ProfileResolver
 
 @click.group()
 def cli() -> None:
-    """Export OrcaSlicer profiles as self-contained JSON files.
+    f"""Export OrcaSlicer profiles as self-contained JSON files.
 
     This tool resolves OrcaSlicer profile inheritance chains and exports
     profiles as standalone JSON files without dependencies on parent
     templates.
+
+    Version: {__version__}
     """
 
 

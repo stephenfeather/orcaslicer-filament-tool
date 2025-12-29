@@ -427,3 +427,24 @@ orca_tools validate-profile exports/Bambu\ ABS\ @BBL\ X1C.flattened.json
 # Run all pre-commit hooks manually
 pre-commit run --all-files
 ```
+
+## Release Strategy
+
+### Release Types
+
+**Full Release** (with binaries):
+- Only created when explicitly requested
+- Format: Semantic versioning (e.g., `0.2.0`)
+- Includes compiled binaries for all supported platforms
+- Tagged on main branch
+
+**Development/Test Release** (no binaries):
+- Created automatically during development and testing
+- Format: `{version}-dev.x` or `{version}-test.x` (e.g., `0.2.1-dev.1`, `0.3.0-test.2`)
+- No compiled binaries included
+- Used for CI/CD testing, intermediate releases, and development milestones
+
+### Tagging Convention
+- Full releases: `v0.2.0`
+- Development releases: `v0.2.1-dev.1`, `v0.2.1-dev.2`, etc.
+- Test releases: `v0.3.0-test.1`, `v0.3.0-test.2`, etc.
