@@ -5,6 +5,10 @@ import re
 from pathlib import Path
 from typing import Any
 
+from src.constants import DEFAULT_MATERIAL
+from src.constants import FILAMENT_MATERIAL_DEFAULTS
+from src.constants import STANDARD_FILAMENT_KEYS
+
 
 class ExportError(Exception):
     """Exception raised during profile export."""
@@ -82,6 +86,9 @@ class ProfileExporter:
             if self.validate:
                 self._validate_profile(profile)
 
+            # Populate missing standard keys with material-appropriate defaults
+            profile = self._populate_missing_standard_keys(profile)
+
             # Write JSON to file
             with output_path.open("w", encoding="utf-8") as f:
                 json.dump(profile, f, indent=4, ensure_ascii=False)
@@ -116,6 +123,98 @@ class ProfileExporter:
             >>> paths = exporter.export_profiles(profiles)
         """
         return [self.export_profile(profile) for profile in profiles]
+
+    def _get_defaults_for_material(self, filament_type: str) -> dict[str, Any]:
+        """
+        Get material-appropriate default values for a filament type.
+
+        Uses the filament_type field to lookup template defaults. Falls back to
+        PLA defaults for unknown material types.
+
+        Args:
+            filament_type: Filament type string (e.g., "PA", "PLA", "PETG", "PA6-CF")
+
+        Returns:
+            Dictionary of all 58 standard keys with their default values
+        """
+        # Clean up filament type string
+        material_type = str(filament_type).strip().upper() if filament_type else ""
+
+        # Handle common material names and abbreviations
+        # Check these in order of specificity
+        if material_type.startswith("PPA"):
+            material_type = "PPA-CF"
+        elif material_type.startswith("PPS"):
+            material_type = "PPS"
+        elif material_type.startswith("PA"):  # PA, PA6, PA6-GF, PA6-CF, etc.
+            material_type = "PA"
+        elif material_type.startswith("PVA"):
+            material_type = "PVA"
+        elif material_type.startswith("PETG"):
+            material_type = "PETG"
+        elif material_type.startswith("PLA"):
+            material_type = "PLA"
+        elif material_type.startswith("TPU"):
+            material_type = "TPU"
+        elif material_type.startswith("SBS"):
+            material_type = "SBS"
+        elif material_type.startswith("PC"):
+            material_type = "PC"
+        elif material_type.startswith("HIPS"):
+            material_type = "HIPS"
+        elif material_type.startswith("ASA"):
+            material_type = "ASA"
+        elif material_type.startswith("ABS"):
+            material_type = "ABS"
+
+        # Lookup in material defaults, fall back to default if not found
+        if material_type in FILAMENT_MATERIAL_DEFAULTS:
+            return FILAMENT_MATERIAL_DEFAULTS[material_type].copy()
+
+        return FILAMENT_MATERIAL_DEFAULTS[DEFAULT_MATERIAL].copy()
+
+    def _populate_missing_standard_keys(
+        self, profile: dict[str, Any]
+    ) -> dict[str, Any]:
+        """
+        Populate missing standard filament keys with material-appropriate defaults.
+
+        Identifies which standard keys are missing from the profile and adds them
+        with defaults matched to the filament's material type. Existing keys are
+        never overwritten.
+
+        Args:
+            profile: Profile dictionary to populate
+
+        Returns:
+            Profile with missing standard keys populated
+
+        Examples:
+            >>> profile = {"name": "Test", "type": "filament", "filament_type": ["PA"]}
+            >>> exporter = ProfileExporter()
+            >>> populated = exporter._populate_missing_standard_keys(profile)
+            >>> "nozzle_temperature" in populated  # True
+        """
+        # Only populate if this is a filament profile
+        if profile.get("type") != "filament":
+            return profile
+
+        # Extract filament type for material lookup
+        filament_type_value = profile.get("filament_type", [DEFAULT_MATERIAL])
+        if isinstance(filament_type_value, (list, tuple)):
+            filament_type = filament_type_value[0] if filament_type_value else DEFAULT_MATERIAL
+        else:
+            filament_type = filament_type_value or DEFAULT_MATERIAL
+
+        # Get material-appropriate defaults
+        defaults = self._get_defaults_for_material(filament_type)
+
+        # Populate only missing standard keys
+        for key in STANDARD_FILAMENT_KEYS:
+            if key not in profile and key in defaults:
+                profile[key] = defaults[key]
+
+        return profile
 
     def _generate_filename(
         self, profile: dict[str, Any], suffix: str = "flattened"

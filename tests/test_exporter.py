@@ -317,9 +317,15 @@ class TestRealWorldExports:
         output_path = exporter.export_profile(profile)
         exported = json.loads(output_path.read_text())
 
-        assert len(exported) == 72  # name + type + 70 settings
+        # Should have original 72 keys (name + type + 70 settings) plus
+        # populated standard filament keys (~56 new keys)
+        assert len(exported) >= 72
+        # Verify original keys are preserved
         assert exported["setting_000"] == "value_0"
         assert exported["setting_069"] == "value_69"
+        # Verify standard keys were populated
+        assert "nozzle_temperature" in exported
+        assert "filament_density" in exported
 
     def test_export_maintains_order(self, tmp_path: Path) -> None:
         """Test that export maintains key order (Python 3.7+)."""
