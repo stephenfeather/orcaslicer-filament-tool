@@ -6,6 +6,7 @@ import click
 
 from src import __version__
 from src.config import create_config
+from src.constants import TEMPLATE_VERSION
 from src.exporter import ExportError
 from src.exporter import ProfileExporter
 from src.resolver import CircularInheritanceError
@@ -14,11 +15,26 @@ from src.resolver import ProfileNotFoundError
 from src.resolver import ProfileResolver
 
 
+def _show_version(ctx: click.Context, param: click.Parameter, value: bool) -> None:
+    """Display tool version and template version."""
+    if value:
+        click.echo(f"orcaslicer-export, version {__version__}")
+        click.echo(f"Templates: {TEMPLATE_VERSION}")
+        ctx.exit()
+
+
 @click.group(
     context_settings={"help_option_names": ["-h", "--help"]},
     epilog="\b\nEXAMPLES:\n  orcaslicer-export \"Generic PLA.json\"\n  orcaslicer-export \"/path/to/profile.json\" --output ./exports",
 )
-@click.version_option(version=__version__, prog_name="orcaslicer-export")
+@click.option(
+    "--version",
+    is_flag=True,
+    callback=_show_version,
+    expose_value=False,
+    is_eager=True,
+    help="Show version information and exit.",
+)
 def cli() -> None:
     """Export OrcaSlicer profiles as self-contained JSON files.
 

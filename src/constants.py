@@ -13,6 +13,9 @@ material-type-appropriate defaults from the corresponding template.
 See: https://github.com/SoftFever/OrcaSlicer/releases/tag/v2.3.1
 """
 
+# OrcaSlicer template version these constants are based on
+TEMPLATE_VERSION = "OrcaSlicer 2.3.1"
+
 # Material type to template defaults mapping
 # Keys are filament types as they appear in profiles
 # Values are dictionaries of all 58 standard keys with their defaults
