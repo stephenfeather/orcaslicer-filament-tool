@@ -1,0 +1,66 @@
+name: Build Standalone Executables
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        include:
+          - os: macos-latest
+            name: macos-arm64
+            artifact-name: orcaslicer-export
+
+          - os: windows-latest
+            name: windows-x64
+            artifact-name: orcaslicer-export.exe
+
+          - os: ubuntu-latest
+            name: linux-x64
+            artifact-name: orcaslicer-export
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install nuitka
+
+      - name: Build on macOS/Linux
+        if: runner.os != 'Windows'
+        run: |
+          chmod +x build.sh
+          ./build.sh
+
+      - name: Build on Windows
+        if: runner.os == 'Windows'
+        run: |
+          build.bat
+
+      - name: Upload to Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if [ "${{ runner.os }}" = "Windows" ]; then
+            gh release upload ${{ github.ref_name }} dist/orcaslicer-export.exe --clobber
+          else
+            gh release upload ${{ github.ref_name }} dist/orcaslicer-export --clobber
+          fi
+        shell: bash
