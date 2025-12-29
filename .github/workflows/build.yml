@@ -27,6 +27,7 @@ jobs:
             artifact-name: orcaslicer-export
 
     runs-on: ${{ matrix.os }}
+    timeout-minutes: 120
 
     steps:
       - name: Checkout code
@@ -46,21 +47,53 @@ jobs:
       - name: Build on macOS/Linux
         if: runner.os != 'Windows'
         run: |
-          chmod +x build.sh
-          ./build.sh
+          python -m nuitka \
+            --standalone \
+            --output-filename=orcaslicer-export \
+            --output-dir=dist \
+            --include-package=src \
+            --assume-yes-for-downloads \
+            --remove-output \
+            src/cli.py
 
       - name: Build on Windows
         if: runner.os == 'Windows'
-        shell: cmd
-        run: build.bat
+        shell: pwsh
+        run: |
+          python -m nuitka `
+            --standalone `
+            --output-filename=orcaslicer-export.exe `
+            --output-dir=dist `
+            --include-package=src `
+            --assume-yes-for-downloads `
+            --remove-output `
+            src/cli.py
 
-      - name: Upload to Release
+      - name: Find and Upload Binary
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          # List what was built
+          echo "Contents of dist directory:"
+          find dist -type f | head -20
+
+          # Upload the binary
           if [ "${{ runner.os }}" = "Windows" ]; then
-            gh release upload ${{ github.ref_name }} dist/orcaslicer-export.exe --clobber
+            BINARY=$(find dist -name "*.exe" -type f | head -1)
+            if [ -z "$BINARY" ]; then
+              echo "Windows executable not found in dist/"
+              exit 1
+            fi
+            echo "Uploading: $BINARY"
+            gh release upload ${{ github.ref_name }} "$BINARY" --clobber
           else
-            gh release upload ${{ github.ref_name }} dist/orcaslicer-export --clobber
+            # Find executable (either dist/orcaslicer-export or in subdirectory)
+            BINARY=$(find dist -type f -executable | grep -v ".build" | head -1)
+            if [ -z "$BINARY" ]; then
+              echo "Executable not found in dist/"
+              exit 1
+            fi
+            echo "Uploading: $BINARY"
+            gh release upload ${{ github.ref_name }} "$BINARY" --clobber
           fi
         shell: bash
