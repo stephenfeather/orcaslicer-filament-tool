@@ -45,6 +45,10 @@ output/
 exports/
 *.bak
 
+# Nuitka build artifacts
+*.build/
+*.dist/
+*.onefile-build/
 
 #Ignore vscode AI rules
 .github/instructions/codacy.instructions.md

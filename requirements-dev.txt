@@ -11,5 +11,8 @@ isort>=5.13.0
 pylint>=3.0.0
 mypy>=1.8.0
 
+# Build
+nuitka>=1.9.0
+
 # Pre-commit hooks
 pre-commit>=3.6.0

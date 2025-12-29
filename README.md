@@ -23,6 +23,49 @@ OrcaSlicer uses an inheritance-based configuration system where filament, machin
 - Support for user-created profiles from macOS Application Support directory
 - Optional Orca_tools binary validator for additional OrcaSlicer-specific checks
 
+## Installation
+
+### Option 1: Standalone Executable (Recommended)
+
+Build a standalone executable that doesn't require Python:
+
+**macOS/Linux**:
+```bash
+./build.sh
+```
+
+**Windows**:
+```cmd
+build.bat
+```
+
+The executable will be in `dist/orcaslicer-export` and can be run from anywhere:
+```bash
+./dist/orcaslicer-export export "path/to/profile.json" -o ./exports
+```
+
+To install to your system PATH:
+```bash
+sudo cp dist/orcaslicer-export /usr/local/bin/
+orcaslicer-export export "path/to/profile.json" -o ./exports
+```
+
+### Option 2: Python Package
+
+Install as a Python package (requires Python 3.12+):
+
+```bash
+pip install -e .
+orcaslicer-export export "path/to/profile.json" -o ./exports
+```
+
+### Option 3: Run from Source
+
+```bash
+pip install -r requirements.txt
+python -m src.cli export "path/to/profile.json" -o ./exports
+```
+
 ## Usage
 
 Export an OrcaSlicer profile with full inheritance resolution:

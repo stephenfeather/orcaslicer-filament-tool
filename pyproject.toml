@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "orcaslicer-filament-tool"
+version = "0.1.0"
+description = "Tools for exporting OrcaSlicer configurations as self-contained packages"
+authors = [{name = "Stephen Feather"}]
+readme = "README.md"
+license = {text = "AGPL-3.0"}
+requires-python = ">=3.12"
+dependencies = [
+    "click>=8.1.0",
+]
+
+[project.scripts]
+orcaslicer-export = "src.cli:cli"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["src*"]

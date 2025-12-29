@@ -319,6 +319,44 @@ mypy src/
 pylint src/
 ```
 
+### Building Standalone Executable
+
+Build a standalone executable with Nuitka that doesn't require Python installation:
+
+**macOS/Linux**:
+```bash
+chmod +x build.sh
+./build.sh
+```
+
+**Windows**:
+```cmd
+build.bat
+```
+
+The executable will be created in `dist/orcaslicer-export` (or `orcaslicer-export.exe` on Windows).
+
+**Manual Nuitka build** (if you prefer direct control):
+```bash
+pip install nuitka
+python -m nuitka \
+    --standalone \
+    --onefile \
+    --output-filename=orcaslicer-export \
+    --output-dir=dist \
+    --include-package=src \
+    src/cli.py
+```
+
+**Testing the executable**:
+```bash
+# Show help
+./dist/orcaslicer-export --help
+
+# Export a profile
+./dist/orcaslicer-export export "/path/to/profile.json" -o ./exports
+```
+
 ### Profile Validation
 
 Profiles are validated using multiple tools to ensure correctness and compatibility:
