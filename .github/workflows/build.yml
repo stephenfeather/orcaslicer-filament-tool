@@ -75,3 +75,58 @@ jobs:
           ls -lh "$BINARY"
           gh release upload ${{ github.ref_name }} "$BINARY" --clobber
         shell: bash
+
+  build-windows:
+    runs-on: windows-latest
+    timeout-minutes: 120
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install nuitka
+        shell: cmd
+
+      - name: Build with Nuitka
+        run: |
+          python -m nuitka ^
+            --standalone ^
+            --output-filename=orcaslicer-export.exe ^
+            --output-dir=dist ^
+            --include-package=src ^
+            --assume-yes-for-downloads ^
+            --remove-output ^
+            src/cli.py
+        shell: cmd
+
+      - name: Upload Windows Binary to Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          Write-Host "Looking for Windows executable..."
+          Get-ChildItem -Path dist -Recurse | Format-Table -AutoSize
+
+          $binary = $null
+          if (Test-Path "dist\cli.dist\orcaslicer-export.exe") {
+              $binary = "dist\cli.dist\orcaslicer-export.exe"
+          } elseif (Test-Path "dist\orcaslicer-export.exe") {
+              $binary = "dist\orcaslicer-export.exe"
+          } else {
+              Write-Host "ERROR: Windows executable not found!"
+              exit 1
+          }
+
+          Write-Host "Found executable: $binary"
+          $fileInfo = Get-Item -Path $binary
+          Write-Host "Size: $($fileInfo.Length / 1MB) MB"
+          gh release upload ${{ github.ref_name }} "$binary" --clobber
+        shell: pwsh
