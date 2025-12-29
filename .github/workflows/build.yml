@@ -73,7 +73,9 @@ jobs:
 
           echo "Found executable: $BINARY"
           ls -lh "$BINARY"
-          gh release upload ${{ github.ref_name }} "$BINARY" --clobber
+          # Rename for upload to avoid conflicts with other platforms
+          cp "$BINARY" "dist/orcaslicer-export-macos"
+          gh release upload ${{ github.ref_name }} "dist/orcaslicer-export-macos" --clobber
         shell: bash
 
   build-windows:
@@ -140,7 +142,9 @@ jobs:
           Write-Host "Found executable: $binary"
           $fileInfo = Get-Item -Path $binary
           Write-Host "Size: $($fileInfo.Length / 1MB) MB"
-          gh release upload ${{ github.ref_name }} "$binary" --clobber
+          # Rename for upload to avoid conflicts with other platforms
+          Copy-Item -Path $binary -Destination "dist\orcaslicer-export-windows.exe"
+          gh release upload ${{ github.ref_name }} "dist\orcaslicer-export-windows.exe" --clobber
         shell: pwsh
 
   build-linux:
@@ -206,5 +210,7 @@ jobs:
 
           echo "Found executable: $BINARY"
           ls -lh "$BINARY"
-          gh release upload ${{ github.ref_name }} "$BINARY" --clobber
+          # Rename for upload to avoid conflicts with other platforms
+          cp "$BINARY" "dist/orcaslicer-export-linux"
+          gh release upload ${{ github.ref_name }} "dist/orcaslicer-export-linux" --clobber
         shell: bash
