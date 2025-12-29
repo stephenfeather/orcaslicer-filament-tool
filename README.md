@@ -6,10 +6,6 @@ Tools and scripts for exporting OrcaSlicer configurations as single-file package
 
 OrcaSlicer uses an inheritance-based configuration system where filament, machine, and process profiles can inherit settings from parent templates. This tool resolves these inheritance chains and exports fully self-contained configuration files that work independently.
 
-For more information about OrcaSlicer profiles and how to create them, see the official documentation:
-- [How to create profiles](https://github.com/OrcaSlicer/OrcaSlicer/wiki/How-to-create-profiles) - Official OrcaSlicer wiki guide
-- [Validate profiles](https://github.com/OrcaSlicer/OrcaSlicer/wiki/How-to-create-profiles#validate-profiles) - Profile validation guidelines
-
 ## Features
 
 - Parse OrcaSlicer configuration files (JSON format)
@@ -57,6 +53,12 @@ Contains manufacturer-specific configurations organized by vendor. These files o
 
 ### profile_templates/
 Contains base-level template files that provide default settings inherited by other profiles.
+
+## Resources
+
+For more information about OrcaSlicer profiles and how to create them, see the official documentation:
+- [How to create profiles](https://github.com/OrcaSlicer/OrcaSlicer/wiki/How-to-create-profiles) - Official OrcaSlicer wiki guide
+- [Validate profiles](https://github.com/OrcaSlicer/OrcaSlicer/wiki/How-to-create-profiles#validate-profiles) - Profile validation guidelines
 
 ## License
 
